@@ -87,4 +87,25 @@ contacts.getContact = async (req, res, next) => {
     }
 };
 
+contacts.deleteContact = async (req, res, next) => {
+    try {
+        const contactId = req.params.id;
+        let isValidId = await validateId(contactId);
+        if (!isValidId) {
+            res.status(420);
+            res.json({ "message": "Contact Not Found" }).end();
+        }
+        const deleteCount = await ContactModel.deleteOne({ _id: mongoose.Types.ObjectId(contactId) });
+        if (deleteCount && deleteCount.n) {
+            res.status(200);
+            res.json({ "message": "Contact Deleted Successfully" }).end();
+        } else {
+            res.status(420);
+            res.json({ "message": "Contact Not Found" }).end();
+        }
+    } catch (e) {
+        return next(e);
+    }
+};
+
 module.exports = contacts;

@@ -19,6 +19,10 @@ app.use((err, req, res, next) => {
         res.status(400).json({
             message: err.error.toString()
         });
+    } else if (err && err.errmsg) {
+        res.status(500).json({
+            message: err.errmsg
+        });
     } else {
         res.status(500).json({
             message: "Internal Server Error"
