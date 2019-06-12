@@ -20,6 +20,11 @@ let contactSchema = Joi.object({
     })).required()
 });
 
+let contactGroupSchema = Joi.object({
+    name: Joi.string().required(),
+    contactIds: Joi.array().items(Joi.string().required()).required()
+});
+
 router.post('/contact/add', validator.body(contactSchema), (req, res, next) => {
     contactHandler.addContact(req, res, next);
 });
@@ -44,7 +49,7 @@ router.get('/contact_search', (req, res, next) => {
     contactHandler.searchContact(req, res);
 });
 
-router.post('/contact_group/add', (req, res, next) => {
+router.post('/contact_group/add', validator.body(contactGroupSchema), (req, res, next) => {
     contactGroupHandler.addContactGroup(req, res, next);
 });
 
