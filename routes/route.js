@@ -1,35 +1,18 @@
 "use strict";
 const express = require('express');
-const Joi = require('joi');
 const validator = require('express-joi-validation')({ passError: true })
 
 const contactHandler = require('../handlers/contacts');
 const contactGroupHandler = require('../handlers/contactGroups');
+const schema = require('../schema/schema');
 
 let router = express();
 
-let contactSchema = Joi.object({
-    name: Joi.string().required(),
-    emails: Joi.array().items(Joi.object({
-        type: Joi.string().valid(["WORK", "PERSONAL"]).required(),
-        email: Joi.string().email().required()
-    })).required(),
-    phoneNos: Joi.array().items(Joi.object({
-        type: Joi.string().valid(["WORK", "PERSONAL"]).required(),
-        phoneNo: Joi.string().regex(/^\+?([0-9]{2})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/).required()
-    })).required()
-});
-
-let contactGroupSchema = Joi.object({
-    name: Joi.string().required(),
-    contactIds: Joi.array().items(Joi.string().required()).required()
-});
-
-router.post('/contact/add', validator.body(contactSchema), (req, res, next) => {
+router.post('/contact/add', validator.body(schema.contactSchema), (req, res, next) => {
     contactHandler.addContact(req, res, next);
 });
 
-router.put('/contact/update', (req, res, next) => {
+router.put('/contact/update', validator.body(schema.updateContactSchema), (req, res, next) => {
     contactHandler.updateContact(req, res, next);
 });
 
@@ -49,16 +32,12 @@ router.get('/contact_search', (req, res, next) => {
     contactHandler.searchContact(req, res);
 });
 
-router.post('/contact_group/add', validator.body(contactGroupSchema), (req, res, next) => {
+router.post('/contact_group/add', validator.body(schema.contactGroupSchema), (req, res, next) => {
     contactGroupHandler.addContactGroup(req, res, next);
 });
 
-router.put('/contact_group/update', (req, res, next) => {
-    contactGroupHandler.updateContactGroupName(req, res, next);
-});
-
-router.put('/contact_group/update_members', (req, res, next) => {
-    contactGroupHandler.updateContactGroupMembers(req, res, next);
+router.put('/contact_group/update', validator.body(schema.updateContactGroupSchema), (req, res, next) => {
+    contactGroupHandler.updateContactGroup(req, res, next);
 });
 
 router.get('/contact_group/:id', (req, res, next) => {

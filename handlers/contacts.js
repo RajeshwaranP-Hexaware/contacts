@@ -27,7 +27,7 @@ contacts.addContact = async (req, res, next) => {
  */
 const validateId = (id) => {
     return new Promise((resolve, reject) => {
-        if (!ObjectId.isValid(id)) {
+        if (ObjectId.isValid(id)) {
             return resolve(true);
         } else {
             return resolve(false);
