@@ -7,7 +7,7 @@ const dotenv = require('dotenv').config();
 const getMongooseConnection = require('./config/mongoose');
 
 const app = express()
-const port = process.env.port;
+const port = process.env.port || process.env.PORT;
 
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json());
