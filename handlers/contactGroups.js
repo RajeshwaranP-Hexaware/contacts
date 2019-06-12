@@ -90,5 +90,29 @@ contactGroup.updateContactGroupMembers = async (req, res, next) => {
     }
 };
 
+contactGroup.getContactGroup = async (req, res, next) => {
+    try {
+        const contactGroupId = req.params.id;
+        let isValidId = await validateId(reqObj.id);
+        if (!isValidId) {
+            res.status(421);
+            res.json({ "message": "Contact Group Not Found" }).end();
+        }
+        const contactGroupData = await ContactGroupsModel.findOne({ _id: mongoose.Types.ObjectId(contactGroupId) }).populate('contacts');
+        if (contactGroupData) {
+            const response = {
+                contactGroup: contactGroupData
+            };
+            res.status(200);
+            res.json(response).end();
+        } else {
+            res.status(421);
+            res.json({ "message": "Contact Group Not Found" }).end();
+        }
+    } catch (e) {
+        return next(e);
+    }
+};
+
 
 module.exports = contactGroup;
