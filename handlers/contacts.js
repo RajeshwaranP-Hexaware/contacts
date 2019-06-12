@@ -108,4 +108,42 @@ contacts.deleteContact = async (req, res, next) => {
     }
 };
 
+contacts.listContact = async (req, res, next) => {
+    try {
+        const query = req.query || {};
+        const index = parseInt(query.index) || 0;
+        const limit = parseInt(query.limit) || 10;
+        let contactList = await ContactModel.find().sort({ createdAt: -1 }).skip(index).limit(limit);
+        res.status(200);
+        res.json({ contactList: contactList }).end();
+    } catch (e) {
+        return next(e);
+    }
+};
+
+contacts.searchContact = async (req, res, next) => {
+    try {
+        const query = req.query || {};
+        const index = parseInt(query.index) || 0;
+        const limit = parseInt(query.limit) || 10;
+        let contactList = [];
+        if (query.text) {
+            const searchKey = (new RegExp(query.text, "i"));
+            contactList = await ContactModel.find({
+                $or: [
+                    { 'name': searchKey },
+                    { 'emails.email': searchKey },
+                    { 'phoneNos.phoneNo': searchKey }
+                ]
+            }).sort({ createdAt: -1 }).skip(index).limit(limit);
+        } else {
+            contactList = await ContactModel.find().sort({ createdAt: -1 }).skip(index).limit(limit);
+        }
+        res.status(200);
+        res.json({ contactList: contactList }).end();
+    } catch (e) {
+        return next(e);
+    }
+};
+
 module.exports = contacts;
