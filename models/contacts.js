@@ -1,12 +1,10 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const contactSchema = schema({
-    _id: Schema.Types.ObjectId,
-    name: String,
-    emails: [{ type: String, email: String }],
-    phoneNos: [{ type: String, phoneNo: String }],
-    groups : [{type: Schema.Types.ObjectId, ref : 'ContactGroup'}]
+const contactSchema = Schema({
+    name: { type: String, required: true, unique: true },
+    emails: [{ type: { type: String }, email: { type: String } }],
+    phoneNos: [{ type: { type: String }, phoneNo: { type: String } }]
 }, {
         timestamps: true
     });
