@@ -1,52 +1,71 @@
 "use strict";
 const express = require('express');
+const Joi = require('joi');
+const validator = require('express-joi-validation')({ passError: true })
+
 const contactHandler = require('../handlers/contacts');
 const contactGroupHandler = require('../handlers/contactGroups');
 
 let router = express();
 
-router.post('/contact/add', (req, res) => {
-    contactHandler.addContact(req, res);
+let contactSchema = Joi.object({
+    name: Joi.string().required(),
+    emails: Joi.array().items(Joi.object({
+        type: Joi.string().valid(["WORK", "PERSONAL"]).required(),
+        email: Joi.string().email().required()
+    })).required(),
+    phoneNos: Joi.array().items(Joi.object({
+        type: Joi.string().valid(["WORK", "PERSONAL"]).required(),
+        phoneNo: Joi.string().regex(/^\+?([0-9]{2})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/).required()
+    })).required()
 });
 
-router.put('/contact/update', (req, res) => {
-    contactHandler.updateContact(req, res);
+router.post('/contact/add', validator.body(contactSchema), (req, res, next) => {
+    contactHandler.addContact(req, res, next);
 });
 
-router.get('/contact:contactId', (req, res) => {
-    contactHandler.getContact(req, res);
+router.put('/contact/update', (req, res, next) => {
+    contactHandler.updateContact(req, res, next);
 });
 
-router.delete('/contact:contactId', (req, res) => {
-    contactHandler.deleteContact(req, res);
+router.get('/contact/:id', (req, res, next) => {
+    contactHandler.getContact(req, res, next);
 });
 
-router.get('/contact/list', (req, res) => {
-    contactHandler.listContact(req, res);
+router.delete('/contact/:id', (req, res, next) => {
+    contactHandler.deleteContact(req, res, next);
 });
 
-router.get('/contact/search', (req, res) => {
+router.get('/contacts', (req, res, next) => {
+    contactHandler.listContact(req, res, next);
+});
+
+router.get('/contact_search', (req, res, next) => {
     contactHandler.searchContact(req, res);
 });
 
-router.post('/contact_group/add', (req, res) => {
-    contactGroupHandler.addContactGroup(req, res);
+router.post('/contact_group/add', (req, res, next) => {
+    contactGroupHandler.addContactGroup(req, res, next);
 });
 
-router.put('/contact_group/update', (req, res) => {
-    contactGroupHandler.updateContactGroup(req, res);
+router.put('/contact_group/update', (req, res, next) => {
+    contactGroupHandler.updateContactGroupName(req, res, next);
 });
 
-router.get('/contact_group:contactId', (req, res) => {
-    contactGroupHandler.getContactGroup(req, res);
+router.put('/contact_group/update_members', (req, res, next) => {
+    contactGroupHandler.updateContactGroupMembers(req, res, next);
 });
 
-router.delete('/contact_group:contactId', (req, res) => {
-    contactGroupHandler.deleteContactGroup(req, res);
+router.get('/contact_group/:id', (req, res, next) => {
+    contactGroupHandler.getContactGroup(req, res, next);
 });
 
-router.get('/contact_group/list', (req, res) => {
-    contactGroupHandler.listContactGroup(req, res);
+router.delete('/contact_group/:id', (req, res, next) => {
+    contactGroupHandler.deleteContactGroup(req, res, next);
+});
+
+router.get('/contact_groups', (req, res, next) => {
+    contactGroupHandler.listContactGroup(req, res, next);
 });
 
 module.exports = router;

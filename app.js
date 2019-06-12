@@ -13,6 +13,19 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json());
 app.use(routes);
 
+app.use((err, req, res, next) => {
+    console.log('FINAL ERROR ', JSON.stringify(err));
+    if (err && err.error && err.error.isJoi) {
+        res.status(400).json({
+            message: err.error.toString()
+        });
+    } else {
+        res.status(500).json({
+            message: "Internal Server Error"
+        });
+    }
+});
+
 app.listen(port, () => {
     getMongooseConnection()
         .then(() => {
