@@ -62,4 +62,29 @@ contacts.updateContact = async (req, res, next) => {
     }
 };
 
+contacts.getContact = async (req, res, next) => {
+    try {
+        const contactId = req.params.id;
+        let isValidId = await validateId(contactId);
+        if (!isValidId) {
+            res.status(420);
+            res.json({ "message": "Contact Not Found" }).end();
+        }
+        const contactData = await ContactModel.findOne({ _id: mongoose.Types.ObjectId(contactId) });
+        if (contactData) {
+            const response = {
+                contact: contactData
+            };
+            res.status(200);
+            res.json(response).end();
+        } else {
+            res.status(420);
+            res.json({ "message": "Contact Not Found" }).end();
+        }
+    } catch (e) {
+        console.log('KKKKK ', JSON.stringify(e));
+        return next(e);
+    }
+};
+
 module.exports = contacts;
