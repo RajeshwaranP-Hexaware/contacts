@@ -44,3 +44,5 @@ process.on('unCaughtException', function (err) {
     console.log(err);
     process.exit(1);
 });
+
+module.exports = app;
