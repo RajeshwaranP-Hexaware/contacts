@@ -114,5 +114,38 @@ contactGroup.getContactGroup = async (req, res, next) => {
     }
 };
 
+contactGroup.deleteContactGroup = async (req, res, next) => {
+    try {
+        const contactGroupId = req.params.id;
+        let isValidId = await validateId(reqObj.id);
+        if (!isValidId) {
+            res.status(421);
+            res.json({ "message": "Contact Group Not Found" }).end();
+        }
+        const deleteCount = await ContactGroupsModel.deleteOne({ _id: mongoose.Types.ObjectId(contactGroupId) });
+        if (deleteCount && deleteCount.n) {
+            res.status(200);
+            res.json({ "message": "Contact Group Deleted Successfully" }).end();
+        } else {
+            res.status(421);
+            res.json({ "message": "Contact Group Not Found" }).end();
+        }
+    } catch (e) {
+        return next(e);
+    }
+};
+
+contactGroup.listContactGroup = async (req, res, next) => {
+    try {
+        const query = req.query || {};
+        const index = parseInt(query.index) || 0;
+        const limit = parseInt(query.limit) || 10;
+        let contactGroupList = await ContactGroupsModel.find().populate('contacts').sort({ createdAt: -1 }).skip(index).limit(limit);
+        res.status(200);
+        res.json({ contactGroupList: contactGroupList }).end();
+    } catch (e) {
+        return next(e);
+    }
+};
 
 module.exports = contactGroup;
